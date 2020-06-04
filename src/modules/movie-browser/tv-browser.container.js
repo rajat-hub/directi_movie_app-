@@ -67,6 +67,7 @@ class TVBrowser extends React.Component {
     let searchedMovies = [];
     const { topShows } = this.props;
     const movies = movieHelpers.getMoviesList(topShows.response);
+
     searchedMovies = movieHelpers.getMoviesList(
       this.props.movieSearch.response
     );
@@ -122,14 +123,15 @@ class TVBrowser extends React.Component {
             </form>
           </Row>
           <Row>
-            <MovieList
+            {/* <MovieList
               movies={
                 searchedMovies && searchedMovies.length
                   ? searchedMovies
                   : movies
               }
               isLoading={topShows.isLoading}
-            />
+            /> */}
+            <MovieList movies={movies} isLoading={topShows.isLoading} />
           </Row>
         </Container>
         <MovieModal />
