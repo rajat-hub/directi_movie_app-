@@ -1,4 +1,0 @@
-[build]
-  command = "npm run build"
-  publish="directi-app/build"
-  base = "directi-app"
