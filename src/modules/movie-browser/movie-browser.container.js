@@ -155,7 +155,7 @@ class MovieBrowser extends React.Component {
               }
               isLoading={topMovies.isLoading}
             /> */}
-            <MovieList movies={movies} isLoading={topShows.isLoading} />
+            <MovieList movies={movies} isLoading={topMovies.isLoading} />
           </Row>
         </Container>
         <MovieModal />
