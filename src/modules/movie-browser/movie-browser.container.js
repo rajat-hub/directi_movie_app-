@@ -5,7 +5,7 @@ import { AppBar, TextField, Tabs, Tab } from 'material-ui';
 import IconButton from 'material-ui/IconButton';
 import Search from 'material-ui/svg-icons/action/search';
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
 // { getTopMovies, ... }
 
 import * as movieActions from './movie-browser.actions';
@@ -14,6 +14,7 @@ import MovieList from './movie-list/movie-list.component';
 import * as scrollHelpers from '../common/scroll.helpers';
 import MovieModal from './movie-modal/movie-modal.container';
 import { searchMovies } from './movie-browser.service';
+import RatingCard from '../../containers/RatingCard';
 
 class MovieBrowser extends React.Component {
   constructor(props) {
@@ -21,12 +22,10 @@ class MovieBrowser extends React.Component {
     this.state = {
       currentPage: 1,
       currentMovies: [],
-      searchText: '',
+      searchQuery: '',
+      searchResult: [],
     };
-    // Binds the handleScroll to this class (MovieBrowser)
-    // which provides access to MovieBrowser's props
-    // Note: You don't have to do this if you call a method
-    // directly from a lifecycle method or define an arrow function
+
     this.handleScroll = this.handleScroll.bind(this);
   }
 
@@ -52,28 +51,43 @@ class MovieBrowser extends React.Component {
     }
   }
 
-  handleSearch = async (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
+  handleSearchSubmit = (e) => {
+    console.log('enter handlesearchchange');
+    let language = 'us-US';
+    let User = JSON.parse(localStorage.getItem('User'));
+    if (User) {
+      language = User.low_la + '-' + User.hi_la;
+    }
+    this.setState({ searchQuery: e.target.value }, () => {
+      if (this.state.searchQuery && this.state.searchQuery.length > 1) {
+        if (this.state.searchQuery.length % 2 === 0) {
+          let query = encodeURI(this.state.searchQuery);
+          console.log(query);
+          axios
+            .get(
+              'https://api.themoviedb.org/3/search/movie?api_key=af39d01f63ca2e08e8ebbb95cbfe59a0&language=' +
+                language +
+                '&query=' +
+                query +
+                '&page=1&include_adult=false'
+            )
+            .then((res) => {
+              this.setState({ searchResult: res.data.results });
+              console.log('searchedresults' + this.state.searchResult);
+            });
+        }
+      } else if (
+        this.state.searchQuery === '' ||
+        this.state.searchQuery.length === 0
+      ) {
+        this.setState({ searchResult: [] });
+      }
     });
   };
 
-  onSubmit = async (event) => {
-    console.log(this.state.searchText);
-    event.preventDefault();
-    await this.props.searchMovies(
-      this.state.searchText,
-      this.state.currentPage
-    );
-  };
-
   render() {
-    let searchedMovies = [];
     const { topMovies } = this.props;
     const movies = movieHelpers.getMoviesList(topMovies.response);
-    searchedMovies = movieHelpers.getMoviesList(
-      this.props.movieSearch.response
-    );
 
     var styles = {
       appBar: {
@@ -102,14 +116,14 @@ class MovieBrowser extends React.Component {
               />
               <Tab label="Logout" containerElement={<Link to="/logout" />} />
               <Tab label="Search">
-                <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
+                <form style={{ textAlign: 'center' }}>
                   <TextField
                     floatingLabelText="Search movies and tv shows...."
-                    value={this.state.searchText}
-                    onChange={this.handleSearch}
-                    name="searchText"
+                    value={this.state.searchQuery}
+                    onChange={this.handleSearchSubmit}
+                    name="searchQuery"
                   />
-                  <IconButton type="submit">
+                  <IconButton>
                     <Search />
                   </IconButton>
                 </form>
@@ -130,14 +144,14 @@ class MovieBrowser extends React.Component {
               />
 
               <Tab label="Search">
-                <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
+                <form style={{ textAlign: 'center' }}>
                   <TextField
                     floatingLabelText="Search movies and tv shows...."
-                    value={this.state.searchText}
-                    onChange={this.handleSearch}
-                    name="searchText"
+                    value={this.state.searchQuery}
+                    onChange={this.handleSearchSubmit}
+                    name="searchQuery"
                   />
-                  <IconButton type="submit">
+                  <IconButton>
                     <Search />
                   </IconButton>
                 </form>
@@ -147,15 +161,15 @@ class MovieBrowser extends React.Component {
         )}
         <Container>
           <Row>
-            {/* <MovieList
-              movies={
-                searchedMovies && searchedMovies.length
-                  ? searchedMovies
-                  : movies
-              }
-              isLoading={topMovies.isLoading}
-            /> */}
-            <MovieList movies={movies} isLoading={topMovies.isLoading} />
+            {this.state.searchResult.length > 1 ? (
+              this.state.searchResult.map((movie) => (
+                <div className="col-md-3" key={movie.id}>
+                  <RatingCard data={movie} />
+                </div>
+              ))
+            ) : (
+              <MovieList movies={movies} isLoading={topMovies.isLoading} />
+            )}
           </Row>
         </Container>
         <MovieModal />
