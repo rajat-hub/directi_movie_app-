@@ -10,7 +10,8 @@ import { Link } from 'react-router-dom';
 class RatingView extends React.Component {
   state = {
     currentPage: 1,
-    results: [],
+    movieresults: [],
+    showresults: [],
     totalPages: 1,
     total_results: 1,
     loading: true,
@@ -29,7 +30,24 @@ class RatingView extends React.Component {
         )
         .then((res) => {
           this.setState({
-            results: res.data.results,
+            movieresults: res.data.results,
+            currentPage: res.data.page,
+            totalPages: res.data.total_pages,
+            loading: false,
+          });
+        });
+
+      axios
+        .get(
+          'https://api.themoviedb.org/3/account/' +
+            account_id +
+            '/rated/tv?api_key=af39d01f63ca2e08e8ebbb95cbfe59a0&session_id=' +
+            localStorage.getItem('TMDB_session_id') +
+            '&language=en-US&sort_by=created_at.asc&page=1'
+        )
+        .then((res) => {
+          this.setState({
+            showresults: res.data.results,
             currentPage: res.data.page,
             totalPages: res.data.total_pages,
             loading: false,
@@ -101,7 +119,31 @@ class RatingView extends React.Component {
                 marginRight: '-30px',
               }}
             >
-              {this.state.results.map((movie) => (
+              {this.state.movieresults.map((movie) => (
+                <div className="col-md-3" key={movie.id}>
+                  <RatingCard data={movie} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="row mt-5">
+          <div className="col-md-12 pt-3" style={{ textAlign: 'center' }}>
+            <h1 className="h5-responsive font-weight-bold text-center text-uppercase pb-5">
+              Your rated shows
+            </h1>
+          </div>
+          <div className="col-md-12 mt-2">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-start',
+                flexWrap: 'wrap',
+                alignItems: 'inherit',
+                marginRight: '-30px',
+              }}
+            >
+              {this.state.showresults.map((movie) => (
                 <div className="col-md-3" key={movie.id}>
                   <RatingCard data={movie} />
                 </div>

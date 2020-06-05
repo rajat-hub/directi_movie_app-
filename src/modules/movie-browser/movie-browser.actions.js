@@ -42,11 +42,11 @@ export const rateMovie = (movieId, newValue) =>
     newValue,
   });
 
-// export const rateShow = (showId, newValue) =>
-//   createAsyncActionCreator(keys.RATE_SHOW, movieService.rateShow, {
-//     showId,
-//     newValue,
-//   });
+export const rateShow = (showId, newValue) =>
+  createAsyncActionCreator(keys.RATE_SHOW, movieService.rateShow, {
+    showId,
+    newValue,
+  });
 
 export const getMovieDetails = (movieId) =>
   createAsyncActionCreator(

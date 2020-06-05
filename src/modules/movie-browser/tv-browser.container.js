@@ -28,6 +28,7 @@ class TVBrowser extends React.Component {
   }
 
   componentDidMount() {
+    localStorage.setItem('shows', 'yes');
     window.onscroll = this.handleScroll;
     this.props.getTopShows(this.state.currentPage);
   }
@@ -85,7 +86,10 @@ class TVBrowser extends React.Component {
       <div>
         {localStorage.getItem('TMDB_session_id') ? (
           <AppBar title="Movie Browser" showMenuIconButton={false}>
-            <Tabs style={styles.tabs}>
+            <Tabs
+              style={styles.tabs}
+              inkBarStyle={{ backgroundColor: 'rgb(0, 188, 212)' }}
+            >
               <Tab label="Movies" containerElement={<Link to="/movies" />} />
               <Tab label="TV shows" containerElement={<Link to="/shows" />} />
 
@@ -94,34 +98,51 @@ class TVBrowser extends React.Component {
                 containerElement={<Link to="/rating" />}
               />
               <Tab label="Logout" containerElement={<Link to="/logout" />} />
+              <Tab label="Search">
+                <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
+                  <TextField
+                    floatingLabelText="Search movies and tv shows...."
+                    value={this.state.searchText}
+                    onChange={this.handleSearch}
+                    name="searchText"
+                  />
+                  <IconButton type="submit">
+                    <Search />
+                  </IconButton>
+                </form>
+              </Tab>
             </Tabs>
           </AppBar>
         ) : (
           <AppBar title="Movie Browser" showMenuIconButton={false}>
-            <Tabs style={styles.tabs}>
+            <Tabs
+              style={styles.tabs}
+              inkBarStyle={{ backgroundColor: 'rgb(0, 188, 212)' }}
+            >
               <Tab label="Movies" containerElement={<Link to="/movies" />} />
               <Tab label="TV shows" containerElement={<Link to="/shows" />} />
               <Tab
                 label="Login with tmdb credentials"
                 containerElement={<Link to="/login" />}
               />
+
+              <Tab label="Search">
+                <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
+                  <TextField
+                    floatingLabelText="Search movies and tv shows...."
+                    value={this.state.searchText}
+                    onChange={this.handleSearch}
+                    name="searchText"
+                  />
+                  <IconButton type="submit">
+                    <Search />
+                  </IconButton>
+                </form>
+              </Tab>
             </Tabs>
           </AppBar>
         )}
         <Container>
-          <Row>
-            <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
-              <TextField
-                floatingLabelText="Search movies and tv shows..."
-                value={this.state.searchText}
-                onChange={this.handleSearch}
-                name="searchText"
-              />
-              <IconButton type="submit">
-                <Search />
-              </IconButton>
-            </form>
-          </Row>
           <Row>
             {/* <MovieList
               movies={

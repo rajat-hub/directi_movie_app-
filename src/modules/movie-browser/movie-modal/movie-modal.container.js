@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import _ from 'lodash';
 import { closeMovieModal } from './movie-modal.actions';
-import { getMovieDetails, rateMovie } from '../movie-browser.actions';
+import { getMovieDetails, rateMovie, rateShow } from '../movie-browser.actions';
 import * as movieHelpers from '../movie-browser.helpers';
 import Loader from '../../common/loader.component';
 
@@ -69,17 +69,34 @@ class MovieModalContainer extends React.Component {
             <p>{movie.overview}</p>
             <p>Popularity: {movie.popularity}</p>
             <p>Budget: ${movie.budget}</p>
-            <Rating
-              name="simple-controlled"
-              value={this.state.value}
-              onChange={(event, newValue) => {
-                this.props.rateMovie(movie.id, newValue);
-                this.setState({
-                  value: newValue,
-                });
-                toast.info('Rating saved successfully');
-              }}
-            />
+            {localStorage.getItem('TMDB_session_id') &&
+            localStorage.getItem('shows') == 'no' ? (
+              <Rating
+                name="simple-controlled"
+                value={this.state.value}
+                onChange={(event, newValue) => {
+                  this.props.rateMovie(movie.id, newValue);
+                  this.setState({
+                    value: newValue,
+                  });
+                  toast.info('Rating saved successfully');
+                }}
+              />
+            ) : null}
+            {localStorage.getItem('TMDB_session_id') &&
+            localStorage.getItem('shows') == 'yes' ? (
+              <Rating
+                name="simple-controlled"
+                value={this.state.value}
+                onChange={(event, newValue) => {
+                  this.props.rateShow(movie.id, newValue);
+                  this.setState({
+                    value: newValue,
+                  });
+                  toast.info('Rating saved successfully');
+                }}
+              />
+            ) : null}
             <ToastContainer position={toast.POSITION.TOP_RIGHT} />
           </div>
         </Loader>
@@ -96,5 +113,5 @@ export default connect(
     isLoading: _.get(state, 'movieBrowser.movieDetails.isLoading', false),
   }),
 
-  { closeMovieModal, getMovieDetails, rateMovie }
+  { closeMovieModal, getMovieDetails, rateMovie, rateShow }
 )(MovieModalContainer);

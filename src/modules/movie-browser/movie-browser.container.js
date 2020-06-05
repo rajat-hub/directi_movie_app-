@@ -6,7 +6,7 @@ import IconButton from 'material-ui/IconButton';
 import Search from 'material-ui/svg-icons/action/search';
 import { Link } from 'react-router-dom';
 
-// e.g. { getTopMovies, ... }
+// { getTopMovies, ... }
 
 import * as movieActions from './movie-browser.actions';
 import * as movieHelpers from './movie-browser.helpers';
@@ -31,6 +31,7 @@ class MovieBrowser extends React.Component {
   }
 
   componentDidMount() {
+    localStorage.setItem('shows', 'no');
     window.onscroll = this.handleScroll;
     this.props.getTopMovies(this.state.currentPage);
   }
@@ -88,7 +89,10 @@ class MovieBrowser extends React.Component {
       <div>
         {localStorage.getItem('TMDB_session_id') ? (
           <AppBar title="Movie Browser" showMenuIconButton={false}>
-            <Tabs style={styles.tabs}>
+            <Tabs
+              style={styles.tabs}
+              inkBarStyle={{ backgroundColor: 'rgb(0, 188, 212)' }}
+            >
               <Tab label="Movies" containerElement={<Link to="/movies" />} />
               <Tab label="TV shows" containerElement={<Link to="/shows" />} />
 
@@ -97,43 +101,61 @@ class MovieBrowser extends React.Component {
                 containerElement={<Link to="/rating" />}
               />
               <Tab label="Logout" containerElement={<Link to="/logout" />} />
+              <Tab label="Search">
+                <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
+                  <TextField
+                    floatingLabelText="Search movies and tv shows...."
+                    value={this.state.searchText}
+                    onChange={this.handleSearch}
+                    name="searchText"
+                  />
+                  <IconButton type="submit">
+                    <Search />
+                  </IconButton>
+                </form>
+              </Tab>
             </Tabs>
           </AppBar>
         ) : (
           <AppBar title="Movie Browser" showMenuIconButton={false}>
-            <Tabs style={styles.tabs}>
+            <Tabs
+              style={styles.tabs}
+              inkBarStyle={{ backgroundColor: 'rgb(0, 188, 212)' }}
+            >
               <Tab label="Movies" containerElement={<Link to="/movies" />} />
               <Tab label="TV shows" containerElement={<Link to="/shows" />} />
               <Tab
                 label="Login with tmdb credentials"
                 containerElement={<Link to="/login" />}
               />
+
+              <Tab label="Search">
+                <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
+                  <TextField
+                    floatingLabelText="Search movies and tv shows...."
+                    value={this.state.searchText}
+                    onChange={this.handleSearch}
+                    name="searchText"
+                  />
+                  <IconButton type="submit">
+                    <Search />
+                  </IconButton>
+                </form>
+              </Tab>
             </Tabs>
           </AppBar>
         )}
         <Container>
           <Row>
-            <form onSubmit={this.onSubmit} style={{ textAlign: 'center' }}>
-              <TextField
-                floatingLabelText="Search movies and tv shows...."
-                value={this.state.searchText}
-                onChange={this.handleSearch}
-                name="searchText"
-              />
-              <IconButton type="submit">
-                <Search />
-              </IconButton>
-            </form>
-          </Row>
-          <Row>
-            <MovieList
+            {/* <MovieList
               movies={
                 searchedMovies && searchedMovies.length
                   ? searchedMovies
                   : movies
               }
               isLoading={topMovies.isLoading}
-            />
+            /> */}
+            <MovieList movies={movies} isLoading={topShows.isLoading} />
           </Row>
         </Container>
         <MovieModal />
